@@ -1,0 +1,61 @@
+name: spotify_visualizer
+description: A Flutter app with homescreen widget that shows old-school sound wave visualizer of currently-playing Spotify track
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP and networking
+  http: ^1.1.0
+  dio: ^5.3.2
+  
+  # Authentication and secure storage
+  flutter_secure_storage: ^9.0.0
+  crypto: ^3.0.3
+  uni_links: ^0.5.1
+  url_launcher: ^6.2.1
+  
+  # State management
+  provider: ^6.1.1
+  
+  # JSON serialization
+  json_annotation: ^4.8.1
+  
+  # Widget and platform specific
+  shared_preferences: ^2.2.2
+  home_widget: ^0.4.0
+  workmanager: ^0.5.1
+  
+  # UI and animations
+  flutter_animate: ^4.3.0
+  
+  # Utils
+  path_provider: ^2.1.1
+  uuid: ^4.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
+  mockito: ^5.4.2
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/test_data/
+  
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-Regular.ttf
+        - asset: assets/fonts/Orbitron-Bold.ttf
+          weight: 700

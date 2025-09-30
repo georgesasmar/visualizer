@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spotify Visualizer</string>
+    <string name="appwidget_text">Spotify Visualizer</string>
+    <string name="add_widget">Add widget</string>
+</resources>
