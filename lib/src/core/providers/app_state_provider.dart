@@ -137,10 +137,13 @@ class AppStateProvider with ChangeNotifier {
 
   Future<void> _loadTrackAnalysis(String trackId) async {
     try {
-      final [analysis, features] = await Future.wait([
+      final results = await Future.wait([
         _spotifyService.getAudioAnalysis(trackId),
         _spotifyService.getAudioFeatures(trackId),
       ]);
+
+      final analysis = results[0] as AudioAnalysis?;
+      final features = results[1] as AudioFeatures?;
 
       if (analysis != null && features != null) {
         _currentAudioAnalysis = analysis;
