@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Required for SystemUiOverlayStyle
 
 class AppTheme {
+  // Primary colors
   static const Color primaryGreen = Color(0xFF1DB954);
   static const Color primaryBlack = Color(0xFF191414);
   static const Color darkGrey = Color(0xFF121212);
   static const Color lightGrey = Color(0xFFB3B3B3);
   static const Color white = Color(0xFFFFFFFF);
-  
-  // Visualizer colors
+
+  // Visualizer neon colors
   static const Color neonGreen = Color(0xFF39FF14);
   static const Color neonBlue = Color(0xFF00FFFF);
   static const Color neonPink = Color(0xFFFF073A);
   static const Color neonYellow = Color(0xFFFFFF00);
   static const Color neonOrange = Color(0xFFFF8C00);
 
+  // Light theme
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -27,11 +30,9 @@ class AppTheme {
         onSecondary: white,
         surface: white,
         onSurface: primaryBlack,
-        background: white,
-        onBackground: primaryBlack,
         error: Colors.red,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: white,
         foregroundColor: primaryBlack,
         elevation: 0,
@@ -45,7 +46,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         color: white,
@@ -75,6 +76,7 @@ class AppTheme {
     );
   }
 
+  // Dark theme
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -88,11 +90,9 @@ class AppTheme {
         onSecondary: primaryBlack,
         surface: darkGrey,
         onSurface: white,
-        background: primaryBlack,
-        onBackground: white,
         error: Colors.red,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: primaryBlack,
         foregroundColor: white,
         elevation: 0,
@@ -106,7 +106,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         color: darkGrey,
@@ -136,6 +136,7 @@ class AppTheme {
     );
   }
 
+  // Preset colors for waveform visualizer
   static List<Color> get visualizerColorPresets => [
     neonGreen,
     neonBlue,

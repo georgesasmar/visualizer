@@ -20,8 +20,8 @@ class AppStateProvider with ChangeNotifier {
     required VisualizerService visualizerService,
     required WidgetService widgetService,
   }) : _spotifyService = spotifyService,
-       _visualizerService = visualizerService,
-       _widgetService = widgetService {
+        _visualizerService = visualizerService,
+        _widgetService = widgetService {
     _initialize();
   }
 
@@ -52,7 +52,7 @@ class AppStateProvider with ChangeNotifier {
   VisualizerData get visualizerData => _visualizerData;
   bool get isPlaying => _currentlyPlaying?.isPlaying ?? false;
   double get trackProgress {
-    if (_currentlyPlaying?.progressMs == null || 
+    if (_currentlyPlaying?.progressMs == null ||
         _currentlyPlaying?.item?.durationMs == null) return 0.0;
     return _currentlyPlaying!.progressMs! / _currentlyPlaying!.item!.durationMs;
   }
@@ -61,7 +61,7 @@ class AppStateProvider with ChangeNotifier {
     try {
       await _spotifyService.initialize();
       await _widgetService.initialize();
-      
+
       if (_spotifyService.isAuthenticated) {
         _appStatus = AppStatus.authenticated;
         _startPeriodicUpdates();
@@ -100,7 +100,7 @@ class AppStateProvider with ChangeNotifier {
     _updateTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       _updateCurrentlyPlaying();
     });
-    
+
     // Schedule widget updates
     _widgetService.schedulePeriodicUpdates();
   }
@@ -108,27 +108,27 @@ class AppStateProvider with ChangeNotifier {
   Future<void> _updateCurrentlyPlaying() async {
     try {
       final currentlyPlaying = await _spotifyService.getCurrentlyPlaying();
-      
+
       if (currentlyPlaying != null) {
         _currentlyPlaying = currentlyPlaying;
-        
+
         // Check if track changed
         final trackId = currentlyPlaying.item?.id;
         if (trackId != null && trackId != _lastTrackId) {
           _lastTrackId = trackId;
           await _loadTrackAnalysis(trackId);
         }
-        
+
         // Update visualizer progress
         _updateVisualizerProgress();
-        
+
         // Update widget
         _updateWidget();
       } else {
         _currentlyPlaying = null;
         _resetVisualizerData();
       }
-      
+
       notifyListeners();
     } catch (e) {
       print('Error updating currently playing: $e');
@@ -148,14 +148,14 @@ class AppStateProvider with ChangeNotifier {
       if (analysis != null && features != null) {
         _currentAudioAnalysis = analysis;
         _currentAudioFeatures = features;
-        
+
         // Generate waveform
         final waveform = _visualizerService.generateSimplifiedWaveform(
           analysis,
           features,
           sampleCount: _visualizerData.sampleRate,
         );
-        
+
         _visualizerData = _visualizerData.copyWith(amplitudes: waveform);
       }
     } catch (e) {
@@ -164,10 +164,10 @@ class AppStateProvider with ChangeNotifier {
   }
 
   void _updateVisualizerProgress() {
-    if (_currentlyPlaying?.progressMs != null && 
+    if (_currentlyPlaying?.progressMs != null &&
         _currentlyPlaying?.item?.durationMs != null) {
-      final progress = _currentlyPlaying!.progressMs! / 
-                      _currentlyPlaying!.item!.durationMs;
+      final progress = _currentlyPlaying!.progressMs! /
+          _currentlyPlaying!.item!.durationMs;
       _visualizerData = _visualizerData.copyWith(
         currentProgress: progress,
         isPlaying: _currentlyPlaying!.isPlaying,

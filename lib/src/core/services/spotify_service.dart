@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/spotify_models.dart';
 import 'storage_service.dart';
 
 class SpotifyService {
-  static const String clientId = 'YOUR_SPOTIFY_CLIENT_ID'; // Replace with actual client ID
+  static const String clientId = 'd1341ffc2cd844b9b94b942a188a16fd'; // Replace with actual client ID
   static const String redirectUri = 'com.example.spotifyvisualizer://callback';
   static const String scopes = 'user-read-playback-state user-read-currently-playing';
   static const String baseUrl = 'https://api.spotify.com/v1';
@@ -28,7 +28,8 @@ class SpotifyService {
     }
   }
 
-  bool get isAuthenticated => _currentTokens != null && !_currentTokens!.isExpired;
+  bool get isAuthenticated =>
+      _currentTokens != null && !_currentTokens!.isExpired;
 
   Future<bool> authenticate() async {
     try {
@@ -50,12 +51,28 @@ class SpotifyService {
         throw Exception('Could not launch auth URL');
       }
 
-      // Listen for the redirect
-      await for (final uri in linkStream) {
-        if (uri.startsWith(redirectUri)) {
-          final parsedUri = Uri.parse(uri);
-          final code = parsedUri.queryParameters['code'];
-          final returnedState = parsedUri.queryParameters['state'];
+      final appLinks = AppLinks();
+
+      // First check if app was opened with a link
+      final Uri? initialUri = await appLinks.getInitialLink();
+      if (initialUri != null &&
+          initialUri.toString().startsWith(redirectUri)) {
+        final code = initialUri.queryParameters['code'];
+        final returnedState = initialUri.queryParameters['state'];
+
+        if (code != null && returnedState == state) {
+          await _exchangeCodeForTokens(code, codeVerifier);
+          return true;
+        }
+      }
+
+      // Listen for new incoming links
+      await for (final Uri? uri in appLinks.uriLinkStream) {
+        if (uri == null) continue;
+
+        if (uri.toString().startsWith(redirectUri)) {
+          final code = uri.queryParameters['code'];
+          final returnedState = uri.queryParameters['state'];
 
           if (code != null && returnedState == state) {
             await _exchangeCodeForTokens(code, codeVerifier);
@@ -71,7 +88,8 @@ class SpotifyService {
     }
   }
 
-  Future<void> _exchangeCodeForTokens(String code, String codeVerifier) async {
+  Future<void> _exchangeCodeForTokens(
+      String code, String codeVerifier) async {
     final response = await http.post(
       Uri.parse(authUrl),
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -109,7 +127,8 @@ class SpotifyService {
     if (response.statusCode == 200) {
       final newTokens = SpotifyTokens.fromJson(json.decode(response.body));
       _currentTokens = newTokens.copyWith(
-        refreshToken: newTokens.refreshToken ?? _currentTokens!.refreshToken,
+        refreshToken:
+        newTokens.refreshToken ?? _currentTokens!.refreshToken,
       );
       await storageService.storeTokens(_currentTokens!);
     }
@@ -119,7 +138,8 @@ class SpotifyService {
     if (!isAuthenticated) return null;
 
     try {
-      final response = await _makeAuthenticatedRequest('$baseUrl/me/player/currently-playing');
+      final response = await _makeAuthenticatedRequest(
+          '$baseUrl/me/player/currently-playing');
       if (response.statusCode == 200) {
         return CurrentlyPlaying.fromJson(json.decode(response.body));
       } else if (response.statusCode == 204) {
@@ -136,7 +156,8 @@ class SpotifyService {
     if (!isAuthenticated) return null;
 
     try {
-      final response = await _makeAuthenticatedRequest('$baseUrl/audio-analysis/$trackId');
+      final response =
+      await _makeAuthenticatedRequest('$baseUrl/audio-analysis/$trackId');
       if (response.statusCode == 200) {
         return AudioAnalysis.fromJson(json.decode(response.body));
       }
@@ -151,7 +172,8 @@ class SpotifyService {
     if (!isAuthenticated) return null;
 
     try {
-      final response = await _makeAuthenticatedRequest('$baseUrl/audio-features/$trackId');
+      final response =
+      await _makeAuthenticatedRequest('$baseUrl/audio-features/$trackId');
       if (response.statusCode == 200) {
         return AudioFeatures.fromJson(json.decode(response.body));
       }
@@ -177,9 +199,11 @@ class SpotifyService {
   }
 
   String _generateCodeVerifier() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     final random = Random.secure();
-    return List.generate(128, (i) => chars[random.nextInt(chars.length)]).join();
+    return List.generate(
+        128, (i) => chars[random.nextInt(chars.length)]).join();
   }
 
   String _generateCodeChallenge(String codeVerifier) {
@@ -189,9 +213,11 @@ class SpotifyService {
   }
 
   String _generateRandomString(int length) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random.secure();
-    return List.generate(length, (i) => chars[random.nextInt(chars.length)]).join();
+    return List.generate(
+        length, (i) => chars[random.nextInt(chars.length)]).join();
   }
 
   Future<void> logout() async {
