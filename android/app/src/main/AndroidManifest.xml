@@ -5,9 +5,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-
+        android:name="${applicationName}"
         android:label="spotify_visualizer"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
 
         <activity
             android:name=".MainActivity"
@@ -17,12 +18,25 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            
+            <!-- Specify that this is the main Flutter activity -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
+            <!-- Deep link handling for Spotify OAuth -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.example.spotifyvisualizer" />
+            </intent-filter>
         </activity>
-
 
         <!-- Widget Provider (if you're using widgets) -->
         <receiver android:name=".SpotifyVisualizerWidgetProvider"
@@ -33,7 +47,5 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/spotify_visualizer_widget_info" />
         </receiver>
-
-    </application
-     >
+    </application>
 </manifest>
